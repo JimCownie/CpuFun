@@ -1,5 +1,5 @@
 # CpuFun Code Snippets
-This repository contains small snippets of code that have been used in the [CPUFun](https://cpufun.substack.com) blog.
+This repository contains small snippets of code that have been used in the [CpuFun](https://cpufun.substack.com) blog.
 
 These are intended to help you to understand the points made in the blog, rather than being production quality code! (So they are unlikely to have CMAKE files :-), though there may be a small `Makefile`).
 
