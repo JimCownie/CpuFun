@@ -7,6 +7,7 @@ import pandas as pd
 ### Which language is each code written in?
 ### Required web search, and is incomplete.
 def language(code):
+    # EPCC's allocations here are at https://github.com/ARCHER2-HPC/usage-analysis in the app-data/code-definitions subdirectory.
     codeToLanguage = {
         "3DNS": "Fortran",  # Private communication from Andy Wheeler
         "a.out" : "Unknown",
@@ -24,33 +25,32 @@ def language(code):
         "CPMD": "Fortran",  # https://www.cpmd.org/wordpress/CPMD/getFile.php?file=manual.pdf "There are several Fortran compiler..."
         "CRYSTAL": "Fortran",
         # https://www.crystal.unito.it/Manuals/crystal17.pdf
-        "ChemShell": "Python",
-        # But it's invoking underlying codes in other languages...
+        "ChemShell": "Fortran", # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/chemshell.code
         "CloverLeaf": "C++",
-        "Code_Saturne": "Fortran + C",
+        "Code_Saturne": "C",
         "DL_MESO": "Fortran + C++",  # https://ccp5.gitlab.io/dl_meso/DL_MESO.html
         "DL_POLY": "Fortran",
         # https://www.scd.stfc.ac.uk/Pages/DL_POLY.aspx
-        "ECHAM": "Unknown",
-        # Probably Fortran, but it's hard to find out.
+        "ECHAM": "Fortran", # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/echam.code
         "EPOCH": "Fortran",
         # http://www.archie-west.ac.uk/wp-content/uploads/2014/02/EPOCH_notes.pdf "EPOCH is a Fortan90 program"
         "FHI aims": "Fortran",
         # Private email: "The core of FHI-aims is written in Fortran"
         "FVCOM": "Fortran",
         # https://github.com/FVCOM-GitHub/fvcom43
-        "Fluidity": "Fortran + C",  # https://github.com/FluidityProject/fluidity
-        "GPAW": "Python",
+        "Fluidity": "Fortran",  # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/fluidity.code https://github.com/FluidityProject/fluidity
+        "GPAW": "C",
         # https://wiki.fysik.dtu.dk/gpaw/ (but sits on top os ASE which invokes many "real" underlying codes."
+        # EPCC reckon C 
         "GROMACS": "C",
         "GS2": "Fortran",  # https://bitbucket.org/gyrokinetics/gs2/src/master/src/
         "HANDE": "Fortran",
         # https://hande.readthedocs.io/en/v1.5/manual/prereq.html "HANDE is written in (mostly) Fortran 2003 with some C code."
-        "HYDRA": "Python",
+        "HYDRA": "Python & Fortran",
         # https://hydra.cc/docs/intro/ (but it invokes other things)
         "HemeLB": "C++",
         # https://github.com/hemelb-codes/hemelb
-        "iIMB": "C & C++",   # Assuming this is the Intel MPI benchmarks https://github.com/intel/mpi-benchmarks
+        "iIMB": "Fortran",   # Info from EPCC https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/iimb.code
         "LAMMPS": "C++",
         "MITgcm": "Fortran",
         # https://github.com/MITgcm/MITgcm
@@ -66,14 +66,14 @@ def language(code):
         # https://github.com/certik/nektar
         "ONETEP": "Fortran",
         # https://www.onetep.org/pmwiki/uploads/Main/Documentation/ONETEP_GPU.pdf shows setting up F90 compilers
-        "OSIRIS": "Unknown",
-        # C++ at a guess, but hard to tell
+        "OSIRIS": "Fortran",
+        # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/osiris.code
         "OpenFOAM": "C++",
         # https://github.com/OpenFOAM/OpenFOAM-10
         "PDNS3D": "Fortran",
         # https://www.archer.ac.uk/documentation/white-papers/benchmarks/UK_National_HPC_Benchmarks.pdf
-        "PRECISE": "Unknown",
-        "ptau3d": "Unknown",
+        "PRECISE": "Fortran",
+        "ptau3d": "C",
         # It's the TAU performance tool, so the real applications are underneath
         "Python": "Python",
         "Quantum Espresso": "Fortran",  # https://gitlab.com/QEF/q-e/-/wikis/Developers/General-information-for-developers#:~:text=Preprocessing-,Fortran%20source%20code,-contains%20preprocessing%20option
