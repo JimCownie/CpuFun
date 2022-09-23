@@ -10,7 +10,7 @@ def language(code):
     # EPCC's allocations here are at https://github.com/ARCHER2-HPC/usage-analysis in the app-data/code-definitions subdirectory.
     codeToLanguage = {
         "3DNS": "Fortran",  # Private communication from Andy Wheeler
-        "a.out" : "Unknown",
+        "a.out": "Unknown",
         "Amber": "Fortran",
         # Also has CUDA and some C++, but since we're not using GPUs, Fortran seems fair
         "AxiSEM3D": "C++",
@@ -25,13 +25,13 @@ def language(code):
         "CPMD": "Fortran",  # https://www.cpmd.org/wordpress/CPMD/getFile.php?file=manual.pdf "There are several Fortran compiler..."
         "CRYSTAL": "Fortran",
         # https://www.crystal.unito.it/Manuals/crystal17.pdf
-        "ChemShell": "Fortran", # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/chemshell.code
+        "ChemShell": "Fortran",  # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/chemshell.code
         "CloverLeaf": "C++",
         "Code_Saturne": "C",
         "DL_MESO": "Fortran + C++",  # https://ccp5.gitlab.io/dl_meso/DL_MESO.html
         "DL_POLY": "Fortran",
         # https://www.scd.stfc.ac.uk/Pages/DL_POLY.aspx
-        "ECHAM": "Fortran", # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/echam.code
+        "ECHAM": "Fortran",  # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/echam.code
         "EPOCH": "Fortran",
         # http://www.archie-west.ac.uk/wp-content/uploads/2014/02/EPOCH_notes.pdf "EPOCH is a Fortan90 program"
         "FHI aims": "Fortran",
@@ -41,8 +41,8 @@ def language(code):
         "Fluidity": "Fortran",  # https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/fluidity.code https://github.com/FluidityProject/fluidity
         "GPAW": "C",
         # https://wiki.fysik.dtu.dk/gpaw/ (but sits on top os ASE which invokes many "real" underlying codes."
-        # EPCC reckon C 
-        "GROMACS": "C",
+        # EPCC reckon C
+        "GROMACS": "C++",  # Requires C++17 and C compilers, so could aruie for C++ and C, but C++ is also reasonable.
         "GS2": "Fortran",  # https://bitbucket.org/gyrokinetics/gs2/src/master/src/
         "HANDE": "Fortran",
         # https://hande.readthedocs.io/en/v1.5/manual/prereq.html "HANDE is written in (mostly) Fortran 2003 with some C code."
@@ -50,7 +50,7 @@ def language(code):
         # https://hydra.cc/docs/intro/ (but it invokes other things)
         "HemeLB": "C++",
         # https://github.com/hemelb-codes/hemelb
-        "iIMB": "Fortran",   # Info from EPCC https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/iimb.code
+        "iIMB": "Fortran",  # Info from EPCC https://github.com/ARCHER2-HPC/usage-analysis/blob/main/app-data/code-definitions/iimb.code
         "LAMMPS": "C++",
         "MITgcm": "Fortran",
         # https://github.com/MITgcm/MITgcm
@@ -77,7 +77,7 @@ def language(code):
         # It's the TAU performance tool, so the real applications are underneath
         "Python": "Python",
         "Quantum Espresso": "Fortran",  # https://gitlab.com/QEF/q-e/-/wikis/Developers/General-information-for-developers#:~:text=Preprocessing-,Fortran%20source%20code,-contains%20preprocessing%20option
-        "RMT": "Fortran", # "Programming language: Fortran" https://www.sciencedirect.com/science/article/pii/S0010465519303856 
+        "RMT": "Fortran",  # "Programming language: Fortran" https://www.sciencedirect.com/science/article/pii/S0010465519303856
         "SBLI": "Fortran",
         # Probably... "Legacy versions of SBLI comprise static hand-written Fortran code" -- OpenSBLI paper https://eprints.soton.ac.uk/402534/1/opensbli.pdf says
         "SENGA": "Fortran",
@@ -100,6 +100,7 @@ def language(code):
     }
     return codeToLanguage.get(code, "Unknown")
 
+
 def removeTrivial(d):
     # Remove entries with value zero
     # Feels as if there should be a diictionary comprehension way of writing this, but I don't see it :-(
@@ -108,6 +109,7 @@ def removeTrivial(d):
         if d[k] != 0:
             res[k] = d[k]
     return res
+
 
 def filter(data, ignore):
     """Pull the program name, the node hours and build a simple dictionary
@@ -123,7 +125,7 @@ def filter(data, ignore):
         res.pop("Unidentified")
         # And also filter all of the entries which have Unknown language
         r = {}
-        for k,v in zip(res.keys(), res.values()):
+        for k, v in zip(res.keys(), res.values()):
             if k != "Overall" and language(k) == "Unknown":
                 r["Overall"] -= v
                 continue
@@ -152,58 +154,66 @@ def sortToList(d, keyFunc=lambda x: x[1]):
     """Return a sorted list of (Code, value) pairs, where the largest
     value is at the start of the list
     """
-    return sorted([(k, v) for k, v in zip(d.keys(), d.values())], key=keyFunc, reverse=True)
+    return sorted(
+        [(k, v) for k, v in zip(d.keys(), d.values())], key=keyFunc, reverse=True
+    )
 
 
 def summariseLanguage(d, preferredLanguage="Fortran"):
     """Extract a summary of the use of each language.
     The preferredLanguage gets all of the usage for mixed language codes if it is present.
     """
-    values= {}
-    for k,v in d:
+    values = {}
+    for k, v in d:
         l = language(k)
         if preferredLanguage and preferredLanguage in l.split(" "):
-            l = preferredLanguage 
-        prev = values.get(l,[0,0])
+            l = preferredLanguage
+        prev = values.get(l, [0, 0])
         prev[0] += 1
         prev[1] += v
         values[l] = prev
-    return sortToList(values,keyFunc=lambda x: x[1][1])
+    return sortToList(values, keyFunc=lambda x: x[1][1])
+
 
 def output(files, d, options):
 
-    prefer  = options.prefer
-    ignore  = options.ignore
+    prefer = options.prefer
+    ignore = options.ignore
     # Assume that we have the "Overall" field and it will be first
     total = d[0][1]
 
-    print ("\nInput files: " + (", ".join(files)))
+    print("\nInput files: " + (", ".join(files)))
     if ignore:
-        print ("""Ignoring unidentified codes and those whose language we cannot determine.
-        If you want to see them don't pass the --ignoreunidentified flag!""")
-    print ("Per code summary\n"
-           "Code, Language, Percentage use, Node Hours")
+        print(
+            """Ignoring unidentified codes and those whose language we cannot determine.
+        If you want to see them don't pass the --ignoreunidentified flag!"""
+        )
+    print("Per code summary\n" "Code, Language, Percentage use, Node Hours")
     for (code, usage) in d:
-        pct = usage*100/total
+        pct = usage * 100 / total
         # Filter out codes that show 0% as being uninteresting.
         if pct < 0.01:
             continue
         line = f"{code}, {language(code)}, {pct:4.2f}%, {usage:.0f}"
-        print (line)
+        print(line)
 
     print()
     # print (f"Total codes: {len(d)-1}")
-    langs = summariseLanguage(d[1:],prefer)   # Skip the total which will be first!
+    langs = summariseLanguage(d[1:], prefer)  # Skip the total which will be first!
     if prefer:
-        print (f"Preferring {prefer}, so allocating all usage for codes that include that language to it alone.")
-    print ("Per language summary\n"
-           "Language, Number of Codes, Percentage use, Node Hours")
+        print(
+            f"Preferring {prefer}, so allocating all usage for codes that include that language to it alone."
+        )
+    print(
+        "Per language summary\n" "Language, Number of Codes, Percentage use, Node Hours"
+    )
     for (lang, use) in langs:
-        pct = use[1]*100/total
+        pct = use[1] * 100 / total
         if pct < 0.01:
             continue
-        print ( f"{lang}, {use[0]}, {pct:4.2f}%, {use[1]:.0f}")
-    
+        print(f"{lang}, {use[0]}, {pct:4.2f}%, {use[1]:.0f}")
+
+
 def generateReport():
     """Do everything!"""
     from optparse import OptionParser
@@ -215,7 +225,7 @@ def generateReport():
         action="store_true",
         dest="ignore",
         default=False,
-        help="Ignore unidentified codes"
+        help="Ignore unidentified codes",
     )
     options.add_option(
         "--prefer",
@@ -223,7 +233,7 @@ def generateReport():
         type="string",
         dest="prefer",
         default=None,
-        help="Language to prefer for codes written in more than one."
+        help="Language to prefer for codes written in more than one.",
     )
 
     (options, args) = options.parse_args()
