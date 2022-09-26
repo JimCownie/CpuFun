@@ -27,7 +27,7 @@ elements = {
     "Al": "Aluminium",
     "Si": "Silicon",
     "P": "Phosphorus",
-    "S": "Sulfur",
+    "S": "Sulphur",
     "Cl": "Chlorine",
     "Ar": "Argon",
     "K": "Potassium",
