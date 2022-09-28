@@ -16,14 +16,14 @@
 #define _GNU_SOURCE 1
 #include <sched.h>
 
-static std::string formatMask(cpu_set_t & mask) {
+static std::string formatMask(cpu_set_t const & mask) {
   std::stringstream res;
   
   // Compress runs
   int base = -1;
   int pos;
-  for (pos=0; i<CPU_SETSIZE;i++) {
-    if (CPU_ISSET(pos, mask)) {
+  for (pos=0; pos<CPU_SETSIZE; pos++) {
+    if (CPU_ISSET(pos, &mask)) {
       if (base == -1) {
         base = pos;
       }
@@ -33,26 +33,25 @@ static std::string formatMask(cpu_set_t & mask) {
         // ("That's rather a personal question, Sir" https://montycasinos.com/montypython/scripts/lifeboat.php.html)
         if (pos == (base+1)) {
           // A single element
-          res << ", " << base;
-          base = -1;
+          res << "," << base;
         } else {
-          res << ", [" << base << ":" << pos-1 << "]";
+          res << "," << base << "-" << pos-1;
         }
+	base = -1;
       }
     }
   }
   if (base != -1) {
-    // End of a run, but how long is it?
-    // ("That's rather a personal question, Sir" https://montycasinos.com/montypython/scripts/lifeboat.php.html)
+    // Finished, but there's a run to print.
     if (pos == (base+1)) {
       // A single element
-      res << ", " << base;
-      base = -1;
+      res << "," << base;
     } else {
-      res << ", [" << base << ":" << pos-1 << "]";
+      res << "," << base << "-" << pos-1;
     }
   }
-  return res.str().substr(2);
+  // Slice off the leading "," 
+  return res.str().substr(1);
 }
 
 static void showAffinity() {
@@ -62,7 +61,10 @@ static void showAffinity() {
     std::cerr << "*** sched_getaffinity failed in thread ***"<< me;
   }
 
-  std::cout << me << ": omp_get_place_num() = " << omp_get_place_num() << ", " << formatMask(&myAffinity) ;
+  std::cout << me << ": omp_get_place_num() = " <<
+    omp_get_place_num() << ", {" << formatMask(myAffinity) << "}\n" ;
+  omp_display_affinity(NULL);
+  std::cout << "\n";
 }
 
 static char const * bindName(omp_proc_bind_t binding) {
@@ -81,14 +83,13 @@ static void outputProcBind() {
   pb = pb ? pb : "UNDEFINED";
   char const * name = bindName(omp_get_proc_bind());
 
-  std::cout << "OMP_PROC_BIND=\"" << pb << "\, omp_proc_bind() = " << name;
+  std::cout << "OMP_PROC_BIND=\"" << pb << "\", omp_proc_bind() = " << name << "\n";
 }
 
 static void outputPlaces() {
   char const * places = getenv("OMP_PLACES");
   places = places ? places : "UNDEFINED";
-  std::cout << "OMP_PLACES=\"" << places << "\", omp_get_num_places() = " << omp_get_num_places();
-  omp_diaply_affinity();
+  std::cout << "OMP_PLACES=\"" << places << "\", omp_get_num_places() = " << omp_get_num_places() << "\n";
 }
 
 int main (int, char **) {
@@ -97,22 +98,26 @@ int main (int, char **) {
 #pragma omp parallel
   {
   }
-  
+
+  std::cout << "omp_get_max_threads() = " << omp_get_max_threads() << "\n";
   // This shows how threads are placed. The placement itself is achieved
   // through the OpenMP envirables. (OMP_PLACES, OMP_PROC_BIND).
-  std::cout << "OMP_PLACES = " << getenv("OMP_PLACES");
+  outputPlaces();
+  outputProcBind();
 
 #pragma omp parallel
   {
     int me = omp_get_thread_num();
     int nthreads = omp_get_num_threads();
+    #pragma omp single
+    std::cout << "omp_get_num_threads() = " << omp_get_num_threads() << "\n";
     // Ensure no races during output and that the results
     // are in thread order.
-#pragma omp for schedule(static,1)
     for (int i=0; i<nthreads; i++) {
       if (i == me) {
         showAffinity();
       }
+#pragma omp barrier      
     }
   }
   return 0;

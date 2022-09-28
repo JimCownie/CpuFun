@@ -85,7 +85,8 @@ bool contiguousWork::incrementBase(unsignedType * basep) {
   // so need sequential consistency to prevent that from happening.                                                     
   // Release consistency ensures earlier stores are complete, but does                                                  
   // not prevent the load from floating up...                                                                           
-  setBase(oldBase + 1, std::memory_order_seq_cst);
+  // setBase(oldBase + 1, std::memory_order_seq_cst);
+  setBase(oldBase + 1, std::memory_order_release);
 
   // Load the end again, so that we can see if it changed while we were                                                 
   // incrementing the base. This thread never moves the end, but other                                                  
