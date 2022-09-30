@@ -181,7 +181,7 @@ def runScaling(runDesc, test, threadsPerCore=1, printOnly=False):
     """Run a scaling test with the specified number of threads/core"""
     
     print (f"cores: {cores}")
-    coreList = [1,2,4] + list(range(8,cores+1,4))
+    coreList = [1,2] + list(range(4,cores+1,4))
     print (f"coreList: {coreList}")
     for numCores in coreList:
         env = computeEnv(threadsPerCore, numCores)
