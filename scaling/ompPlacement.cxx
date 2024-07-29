@@ -61,10 +61,10 @@ static void showAffinity() {
     std::cerr << "*** sched_getaffinity failed in thread ***"<< me;
   }
 
+  char buffer[256];
+  omp_capture_affinity(buffer, sizeof(buffer),"%A");
   std::cout << me << ": omp_get_place_num() = " <<
-    omp_get_place_num() << ", {" << formatMask(myAffinity) << "}\n" ;
-  omp_display_affinity(NULL);
-  std::cout << "\n";
+    omp_get_place_num() << ", {" << formatMask(myAffinity) << "}: " << buffer << "\n" ;
 }
 
 static char const * bindName(omp_proc_bind_t binding) {
@@ -120,6 +120,25 @@ int main (int, char **) {
 #pragma omp barrier      
     }
   }
+
+  // Now try forcing the affinity on the parallel region
+  std::cout << "\nForcing proc_bind(close)\n";
+#pragma omp parallel proc_bind(close)
+  {
+    int me = omp_get_thread_num();
+    int nthreads = omp_get_num_threads();
+    #pragma omp single
+    std::cout << "omp_get_num_threads() = " << omp_get_num_threads() << "\n";
+    // Ensure no races during output and that the results
+    // are in thread order.
+    for (int i=0; i<nthreads; i++) {
+      if (i == me) {
+        showAffinity();
+      }
+#pragma omp barrier      
+    }
+  }
+  
   return 0;
 }
 
