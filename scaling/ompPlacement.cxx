@@ -61,10 +61,8 @@ static void showAffinity() {
     std::cerr << "*** sched_getaffinity failed in thread ***"<< me;
   }
 
-  char buffer[256];
-  omp_capture_affinity(buffer, sizeof(buffer),"%A");
   std::cout << me << ": omp_get_place_num() = " <<
-    omp_get_place_num() << ", {" << formatMask(myAffinity) << "}: " << buffer << "\n" ;
+    omp_get_place_num() << ", {" << formatMask(myAffinity) << "}\n";
 }
 
 static char const * bindName(omp_proc_bind_t binding) {
